@@ -21,8 +21,6 @@ defmodule AkinML.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
-      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
       {:tangram, "~> 0.7.0"}
     ]
   end
