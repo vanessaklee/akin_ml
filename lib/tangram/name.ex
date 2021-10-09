@@ -92,10 +92,7 @@ defmodule AkinML.Tangram.Name do
   @doc """
   Run the predictions using the model
   """
-  def predict(input, names) do
-    model_path = "metrics_for_training.tangram"
-
-    # Load the model
+  def predict(model_path, input, names) do
     model = Tangram.load_model_from_path(model_path)
 
     # Make the prediction!
@@ -113,10 +110,6 @@ defmodule AkinML.Tangram.Name do
     }
     Tangram.log_prediction(model, log_predictions)
 
-    # Print the output.
-    IO.write("Prediction Identifier: ")
-    IO.inspect(indentifier)
-    IO.write("Output: ")
-    IO.inspect(output)
+    output
   end
 end
