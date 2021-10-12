@@ -12,20 +12,19 @@ defmodule AkinML.Tangram.Name do
   Run the predictions using the model
   """
   def run() do
-    model_path = "metrics_for_training.tangram"
-    IO.inspect model_path
+    model_path = "lib/tangram/metrics_for_training.tangram"
 
     # Load the model
     model = Tangram.load_model_from_path(model_path)
 
     # Build inputs from data ready for predictions
-    File.stream!("tangram_predictions.csv")
+    File.stream!("lib/tangram/metrics_for_predicting.csv")
     |> Stream.map(&String.trim(&1))
     |> Enum.to_list()
     |> Enum.each(fn row ->
       [bag_distance, chunk_set, dice_sorensen, metaphone, double_metaphone,
       double_metaphone_chunks, jaccard, jaro_winkler, levenshtein, ngram, overlap,
-      sorted_chunks, tversky, name, _match] = String.split(row, "\t")
+      sorted_chunks, tversky, initials, name, _match] = String.split(row, "\t")
       input = %{
         :bag_distance => bag_distance,
         :chunk_set => chunk_set,
@@ -39,7 +38,8 @@ defmodule AkinML.Tangram.Name do
         :ngram => ngram,
         :overlap => overlap,
         :sorted_chunks => sorted_chunks,
-        :tversky => tversky
+        :tversky => tversky,
+        :initials => initials
       }
 
       # Make the prediction!
@@ -69,16 +69,16 @@ defmodule AkinML.Tangram.Name do
   Log true values
   """
   def truth() do
-    model_path = "metrics_for_training.tangram"
+    model_path = "lib/tangram/metrics_for_training.tangram"
 
     # Load the model
     model = Tangram.load_model_from_path(model_path)
 
-    File.stream!("tangram_predictions.csv")
+    File.stream!("lib/tangram/metrics_for_predicting_nonmatch.csv")
     |> Stream.map(&String.trim(&1))
     |> Enum.to_list()
     |> Enum.each(fn row ->
-      [_, _, _, _, _, _, _, _, _, _, _, _, _, name, match] = String.split(row, "\t")
+      [_, _, _, _, _, _, _, _, _, _, _, _, _, _, name, match] = String.split(row, "\t")
 
       indentifier = "#{name}"
       true_value = %Tangram.LogTrueValueArgs{
@@ -89,27 +89,30 @@ defmodule AkinML.Tangram.Name do
     end)
   end
 
+  @spec predict(binary(), list() | map(), binary()) :: list() | %Tangram.BinaryClassificationPredictOutput{}
   @doc """
   Run the predictions using the model
   """
-  def predict(model_path, input, names) do
-    model = Tangram.load_model_from_path(model_path)
+  def predict(model_path, inputs, identifier) when is_list(inputs) do
+    Enum.map(inputs, fn input ->
+      predict(model_path, input, identifier)
+    end)
+  end
 
-    # Make the prediction!
-    output = Tangram.predict(model, input)
-    # id = make_ref()
-    #   |> :erlang.ref_to_list()
-    #   |> List.to_string()
-    # indentifier = "#{id}: #{name}"
-    indentifier = "#{names}"
-    log_predictions = %Tangram.LogPredictionArgs{
-      :identifier => indentifier,
+  def predict(model_path, input, identifier) do
+    model = Tangram.load_model_from_path(model_path)
+    Tangram.predict(model, input)
+    |> log_prediction(model, input, identifier)
+  end
+
+  defp log_prediction(output, model, input, identifier) do
+    log = %Tangram.LogPredictionArgs{
+      :identifier => "#{identifier}",
       :input => input,
       :options => nil,
       :output => output
     }
-    Tangram.log_prediction(model, log_predictions)
-
+    Tangram.log_prediction(model, log)
     output
   end
 end
