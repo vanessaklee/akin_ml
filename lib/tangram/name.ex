@@ -11,33 +11,34 @@ defmodule AkinML.Tangram.Name do
   @doc """
   Run the predictions using the model
   """
-  def run() do
+  def predict() do
     model_path = "lib/tangram/metrics_for_training.tangram"
 
     # Load the model
     model = Tangram.load_model_from_path(model_path)
 
     # Build inputs from data ready for predictions
-    File.stream!("lib/tangram/metrics_for_predicting.csv")
+    # File.stream!("lib/tangram/metrics_for_predicting.csv")
+    File.stream!("lib/tangram/mini_metrics_for_predicting.csv")
     |> Stream.map(&String.trim(&1))
     |> Enum.to_list()
     |> Enum.each(fn row ->
-      [bag_distance, chunk_set, dice_sorensen, metaphone, double_metaphone,
-      double_metaphone_chunks, jaccard, jaro_winkler, levenshtein, ngram, overlap,
-      sorted_chunks, tversky, initials, name, _match] = String.split(row, "\t")
+      [bag_distance, substring_set, dice_sorensen, metaphone, double_metaphone,
+      substring_double_metaphone, jaccard, jaro_winkler, levenshtein, ngram, overlap,
+      substring_sort, tversky, initials, name, _match] = String.split(row, "\t")
       input = %{
         :bag_distance => bag_distance,
-        :chunk_set => chunk_set,
+        :substring_set => substring_set,
         :dice_sorensen => dice_sorensen,
         :metaphone => metaphone,
         :double_metaphone => double_metaphone,
-        :double_metaphone_chunks => double_metaphone_chunks,
+        :substring_double_metaphone => substring_double_metaphone,
         :jaccard => jaccard,
         :jaro_winkler => jaro_winkler,
         :levenshtein => levenshtein,
         :ngram => ngram,
         :overlap => overlap,
-        :sorted_chunks => sorted_chunks,
+        :substring_sort => substring_sort,
         :tversky => tversky,
         :initials => initials
       }
@@ -74,7 +75,7 @@ defmodule AkinML.Tangram.Name do
     # Load the model
     model = Tangram.load_model_from_path(model_path)
 
-    File.stream!("lib/tangram/metrics_for_predicting_nonmatch.csv")
+    File.stream!("lib/tangram/mini_metrics_for_predicting.csv")
     |> Stream.map(&String.trim(&1))
     |> Enum.to_list()
     |> Enum.each(fn row ->

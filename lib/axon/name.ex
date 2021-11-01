@@ -21,21 +21,22 @@ defmodule AkinML.Axon.Name do
     "Overlap",
     "Sorted Chunks",
     "Tversky",
+    "Initials",
     "Match"
   ]
 
-  def perform() do
+  def train() do
     # split the data into test and train sets, each with inputs and targets
     {test_inputs, test_targets, train_inputs, train_targets} =
       Axon.Data.split_inputs(
-        "./lib/axon/axon.data",
+        "./lib/axon/new.data",
         input_columns: @input_columns,
         target_column: "Match",
         test_train_ratio: 0.1
       )
 
     # train the model
-    model = train(train_inputs, train_targets)
+    model = do_training(train_inputs, train_targets)
 
     # make some predictions
     test_inputs
@@ -58,10 +59,10 @@ defmodule AkinML.Axon.Name do
     end)
   end
 
-  def train(inputs, targets) do
+  def do_training(inputs, targets) do
     model =
       Axon.input({nil, Enum.count(@input_columns)})
-      |> Axon.dense(13)
+      |> Axon.dense(14)
       |> Axon.dropout(rate: @dropout_rate)
       |> Axon.dense(1)
 

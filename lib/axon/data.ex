@@ -13,7 +13,8 @@ defmodule Axon.Data do
     "Overlap" => 10,
     "Sorted Chunks" => 11,
     "Tversky" => 12,
-    "Match" => 13
+    "Initials" => 13,
+    "Match" => 14
   }
 
   def split_inputs(filename, opts \\ []) do
@@ -55,35 +56,37 @@ defmodule Axon.Data do
   def convert(line) do
     [
       bag_distance,
-      chunk_set,
+      substring_set,
       dice_sorensen,
       metaphone,
       double_metaphone,
-      double_metaphone_chunks,
+      substring_double_metaphone,
       jaccard,
       jaro_winkler,
       levenshtein,
       ngram,
       overlap,
-      sorted_chunks,
+      substring_sort,
       tversky,
+      initials,
       match
     ] = line |> String.replace("\n", "") |> String.split("\t")
 
     [
       bag_distance |> String.trim() |> String.to_float(),
-      chunk_set |> String.trim() |> String.to_float(),
+      substring_set |> String.trim() |> String.to_float(),
       dice_sorensen |> String.trim() |> String.to_float(),
       metaphone |> String.trim() |> String.to_float(),
       double_metaphone |> String.trim() |> String.to_float(),
-      double_metaphone_chunks |> String.trim() |> String.to_float(),
+      substring_double_metaphone |> String.trim() |> String.to_float(),
       jaccard |> String.trim() |> String.to_float(),
       jaro_winkler |> String.trim() |> String.to_float(),
       levenshtein |> String.trim() |> String.to_float(),
       ngram |> String.trim() |> String.to_float(),
       overlap |> String.trim() |> String.to_float(),
-      sorted_chunks |> String.trim() |> String.to_float(),
+      substring_sort |> String.trim() |> String.to_float(),
       tversky |> String.trim() |> String.to_float(),
+      initials |> String.trim() |> String.to_float(),
       match |> String.trim() |> String.to_integer()
     ]
   rescue
